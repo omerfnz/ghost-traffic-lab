@@ -27,11 +27,18 @@ class AlarmScheduler(private val context: Context) {
 
     fun cancel() {
         val intent = Intent(context, AlarmReceiver::class.java)
-        val flags = cancelFlags()
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
         val pending = PendingIntent.getBroadcast(
             context, REQUEST_CODE, intent, flags,
         )
-        pending?.let { alarmManager.cancel(it) }
+        if (pending != null) {
+            alarmManager.cancel(pending)
+            pending.cancel()
+        }
     }
 
     fun canScheduleExact(): Boolean {

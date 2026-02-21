@@ -19,11 +19,14 @@ class BotService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
+        LogBroadcaster.clear()
+        LogBroadcaster.emit("[Bot] System armed. Starting...")
         startAsForeground()
         deviceWaker = DeviceWaker(this).also { it.acquireWakeLock() }
+        setClickerTarget(intent)
         launchTargetApp(intent)
         executePayload(intent)
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
@@ -49,6 +52,12 @@ class BotService : Service() {
         }
     }
 
+    private fun setClickerTarget(intent: Intent?) {
+        val targetPkg = intent?.getStringExtra(EXTRA_TARGET_PKG) ?: return
+        ClickerService.instance?.targetPackage = targetPkg
+        LogBroadcaster.emit("[Bot] Clicker target: $targetPkg")
+    }
+
     private fun launchTargetApp(intent: Intent?) {
         val targetPkg = intent?.getStringExtra(EXTRA_TARGET_PKG) ?: return
         try {
@@ -69,9 +78,12 @@ class BotService : Service() {
         try {
             val actions = PayloadAction.fromJsonArray(json)
             payloadEngine = PayloadEngine { LogBroadcaster.emit(it) }
-            payloadEngine?.execute(actions)
+            payloadEngine?.execute(actions) {
+                stopSelf()
+            }
         } catch (e: Exception) {
             LogBroadcaster.emit("[Bot] Payload error: ${e.message}")
+            stopSelf()
         }
     }
 

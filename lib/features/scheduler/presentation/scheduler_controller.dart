@@ -31,9 +31,11 @@ class SchedulerController extends _$SchedulerController {
   Future<void> cancelAlarm() async {
     final bridge = ref.read(nativeBridgeServiceProvider);
     await bridge.cancelAlarm();
-    state = state.copyWith(isScheduled: false);
+    state = state.copyWith(isScheduled: false, selectedTime: null);
   }
 }
+
+const _sentinel = Object();
 
 class SchedulerState {
   const SchedulerState({
@@ -47,12 +49,14 @@ class SchedulerState {
   final bool isScheduled;
 
   SchedulerState copyWith({
-    DateTime? selectedTime,
+    Object? selectedTime = _sentinel,
     String? targetPackage,
     bool? isScheduled,
   }) {
     return SchedulerState(
-      selectedTime: selectedTime ?? this.selectedTime,
+      selectedTime: identical(selectedTime, _sentinel)
+          ? this.selectedTime
+          : selectedTime as DateTime?,
       targetPackage: targetPackage ?? this.targetPackage,
       isScheduled: isScheduled ?? this.isScheduled,
     );

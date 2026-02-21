@@ -69,7 +69,7 @@ lib/
 │       └── app_theme.dart                  # MaterialApp theme config
 ├── product/
 │   ├── models/
-│   │   ├── payload_action.dart             # Freezed union type (5 actions)
+│   │   ├── payload_action.dart             # Freezed union type (12 actions)
 │   │   ├── service_status.dart             # Enum: idle/armed/running/error
 │   │   └── permission_state.dart           # Freezed: 4x permission booleans
 │   └── widgets/
@@ -107,9 +107,10 @@ android/app/src/main/kotlin/com/ghosttraffic/ghost_traffic_lab/
 ├── MethodCallDispatcher.kt      # Routes all MethodChannel calls
 ├── PermissionChecker.kt         # Permission check + Settings intents
 ├── models/
-│   └── PayloadAction.kt         # Sealed class: Wait/Swipe/Click/Launch/TypeText
+│   └── PayloadAction.kt         # Sealed class: Wait/Swipe/Click/Launch/TypeText/OpenUrl/etc. (12 total)
 ├── engine/
-│   ├── PayloadEngine.kt         # Coroutine-based sequential action executor
+│   ├── PayloadEngine.kt         # Coroutine-based sequential action orchestrator
+│   ├── ActionExecutor.kt        # Handlers for 12 distinct action types
 │   └── humanlike/               # Anti-detection behavior engine
 │       ├── GaussianDelay.kt     # Normal distribution random delays
 │       ├── BezierGesture.kt     # Cubic bezier swipe path generator
@@ -217,9 +218,19 @@ fvm flutter build apk --debug
 fvm flutter install
 ```
 
-### Run Tests
+### Run Tests & Automation
 
 ```bash
+# Emulator Auto-Setup (Grants permissions & installs APK)
+./scripts/setup_emulator.fish
+
+# Direct Headless Engine Test (via ADB)
+./scripts/test_engine.fish
+
+# E2E UI Integration Test (Runs on Emulator)
+fvm flutter test integration_test/bot_e2e_test.dart -d emulator-5554
+
+# Unit Tests & Analysis
 fvm flutter test           # 17 unit tests
 fvm flutter analyze        # Static analysis (0 issues)
 ```

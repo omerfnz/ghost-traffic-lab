@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ghost_traffic_lab/features/payload_builder/presentation/payload_builder_controller.dart';
 import 'package:ghost_traffic_lab/features/scheduler/presentation/scheduler_controller.dart';
 import 'package:ghost_traffic_lab/features/scheduler/presentation/scheduler_widgets.dart';
 
@@ -19,21 +20,30 @@ class SchedulerView extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TimePickerCard(state: state, onPick: () => _pickTime(context, ctrl)),
+            TimePickerCard(
+              state: state,
+              onPick: () => _pickTime(context, ctrl),
+            ),
             const SizedBox(height: 16),
-            TargetPackageCard(state: state, ctrl: ctrl),
+            TargetPackageCard(
+              initialValue: state.targetPackage,
+              onChanged: ctrl.setTargetPackage,
+            ),
             const Spacer(),
-            ScheduleButton(state: state, ctrl: ctrl),
+            ScheduleButton(
+              state: state,
+              ctrl: ctrl,
+              payload: ref
+                  .watch(payloadBuilderControllerProvider.notifier)
+                  .toJson(),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Future<void> _pickTime(
-    BuildContext context,
-    SchedulerController ctrl,
-  ) async {
+  Future<void> _pickTime(BuildContext context, SchedulerController ctrl) async {
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -41,8 +51,11 @@ class SchedulerView extends ConsumerWidget {
     if (time == null) return;
     final now = DateTime.now();
     var scheduled = DateTime(
-      now.year, now.month, now.day,
-      time.hour, time.minute,
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
     );
     if (scheduled.isBefore(now)) {
       scheduled = scheduled.add(const Duration(days: 1));

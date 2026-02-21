@@ -9,16 +9,15 @@ part 'dashboard_controller.g.dart';
 @riverpod
 class DashboardController extends _$DashboardController {
   @override
-  DashboardState build() => const DashboardState();
+  DashboardState build() {
+    final perms = ref.watch(permissionsControllerProvider);
+    return DashboardState(permissions: perms);
+  }
 
   Future<void> refresh() async {
     final bridge = ref.read(nativeBridgeServiceProvider);
-    await ref.read(permissionsControllerProvider.notifier).refreshAll();
-    final perms = ref.read(permissionsControllerProvider);
     final running = await bridge.isServiceRunning();
-
     state = state.copyWith(
-      permissions: perms,
       status: running ? ServiceStatus.running : state.status,
     );
   }
@@ -26,10 +25,7 @@ class DashboardController extends _$DashboardController {
   Future<void> arm(String payload, String targetPkg) async {
     if (!state.permissions.allGranted) return;
     final bridge = ref.read(nativeBridgeServiceProvider);
-    await bridge.startService(
-      payload: payload,
-      targetPackage: targetPkg,
-    );
+    await bridge.startService(payload: payload, targetPackage: targetPkg);
     state = state.copyWith(
       status: ServiceStatus.armed,
       targetPackage: targetPkg,
@@ -40,10 +36,7 @@ class DashboardController extends _$DashboardController {
     final bridge = ref.read(nativeBridgeServiceProvider);
     await bridge.stopService();
     await bridge.cancelAlarm();
-    state = state.copyWith(
-      status: ServiceStatus.idle,
-      scheduledTime: null,
-    );
+    state = state.copyWith(status: ServiceStatus.idle, scheduledTime: null);
   }
 
   void setSchedule(DateTime time) {

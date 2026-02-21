@@ -17,6 +17,20 @@ object GestureExecutor {
             .build()
     }
 
+    fun createLongPressGesture(
+        x: Float,
+        y: Float,
+        duration: Long,
+    ): GestureDescription {
+        val path = Path().apply { moveTo(x, y) }
+        val stroke = GestureDescription.StrokeDescription(
+            path, 0L, duration,
+        )
+        return GestureDescription.Builder()
+            .addStroke(stroke)
+            .build()
+    }
+
     fun createSwipeGesture(
         startX: Float,
         startY: Float,

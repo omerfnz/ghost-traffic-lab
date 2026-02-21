@@ -70,7 +70,7 @@ lib/
 │       └── app_theme.dart                  # MaterialApp tema yapılandırması
 ├── product/
 │   ├── models/
-│   │   ├── payload_action.dart             # Freezed union tipi (5 aksiyon)
+│   │   ├── payload_action.dart             # Freezed union tipi (12 aksiyon)
 │   │   ├── service_status.dart             # Enum: idle/armed/running/error
 │   │   └── permission_state.dart           # Freezed: 4x izin boolean'ı
 │   └── widgets/
@@ -92,9 +92,10 @@ android/app/src/main/kotlin/com/ghosttraffic/ghost_traffic_lab/
 ├── MethodCallDispatcher.kt      # Tüm MethodChannel çağrılarını yönlendirir
 ├── PermissionChecker.kt         # İzin kontrolü + Ayarlar intent'leri
 ├── models/
-│   └── PayloadAction.kt         # Sealed class: Wait/Swipe/Click/Launch/TypeText
+│   └── PayloadAction.kt         # Sealed class: Wait/Swipe/Click/Launch/TypeText/OpenUrl vb. (Top. 12)
 ├── engine/
-│   ├── PayloadEngine.kt         # Coroutine tabanlı sıralı aksiyon yürütücü
+│   ├── PayloadEngine.kt         # Coroutine tabanlı sıralı aksiyon orkestratörü
+│   ├── ActionExecutor.kt        # 12 farklı aksiyon tipi için işleyici
 │   └── humanlike/               # Bot algılama karşıtı davranış motoru
 │       ├── GaussianDelay.kt     # Normal dağılımlı rastgele gecikmeler
 │       ├── BezierGesture.kt     # Kübik bezier kaydırma yolu üreteci
@@ -203,9 +204,19 @@ fvm flutter build apk --debug
 fvm flutter install
 ```
 
-### Testleri Çalıştır
+### Testleri & Otomasyonu Çalıştır
 
 ```bash
+# Emulator Oto-Kurulumu (İzinleri verir ve APK'yı kurar)
+./scripts/setup_emulator.fish
+
+# Doğrudan Arka Plan Motoru Testi (ADB üzerinden)
+./scripts/test_engine.fish
+
+# Uçtan Uca (E2E) UI Entegrasyon Testi (Emülatörde çalışır)
+fvm flutter test integration_test/bot_e2e_test.dart -d emulator-5554
+
+# Unit Testler ve Statik Analiz
 fvm flutter test           # 17 birim test
 fvm flutter analyze        # Statik analiz (0 sorun)
 ```

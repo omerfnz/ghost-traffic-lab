@@ -11,30 +11,41 @@ class TimePickerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final timeStr = state.selectedTime != null
         ? '${state.selectedTime!.hour.toString().padLeft(2, '0')}:'
-            '${state.selectedTime!.minute.toString().padLeft(2, '0')}'
+              '${state.selectedTime!.minute.toString().padLeft(2, '0')}'
         : 'Not set';
     return Card(
       child: ListTile(
         leading: const Icon(Icons.access_time, color: AppColors.primary),
         title: const Text('Wake Time'),
         subtitle: Text(timeStr),
-        trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: onPick,
-        ),
+        trailing: IconButton(icon: const Icon(Icons.edit), onPressed: onPick),
       ),
     );
   }
 }
 
-class TargetPackageCard extends StatelessWidget {
+class TargetPackageCard extends StatefulWidget {
   const TargetPackageCard({
-    required this.state,
-    required this.ctrl,
+    required this.initialValue,
+    required this.onChanged,
     super.key,
   });
-  final SchedulerState state;
-  final SchedulerController ctrl;
+
+  final String initialValue;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<TargetPackageCard> createState() => _TargetPackageCardState();
+}
+
+class _TargetPackageCardState extends State<TargetPackageCard> {
+  late final _ctrl = TextEditingController(text: widget.initialValue);
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +58,8 @@ class TargetPackageCard extends StatelessWidget {
             hintText: 'com.android.chrome',
             border: OutlineInputBorder(),
           ),
-          controller: TextEditingController(text: state.targetPackage),
-          onChanged: ctrl.setTargetPackage,
+          controller: _ctrl,
+          onChanged: widget.onChanged,
         ),
       ),
     );
@@ -56,9 +67,15 @@ class TargetPackageCard extends StatelessWidget {
 }
 
 class ScheduleButton extends StatelessWidget {
-  const ScheduleButton({required this.state, required this.ctrl, super.key});
+  const ScheduleButton({
+    required this.state,
+    required this.ctrl,
+    required this.payload,
+    super.key,
+  });
   final SchedulerState state;
   final SchedulerController ctrl;
+  final String payload;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +83,13 @@ class ScheduleButton extends StatelessWidget {
       height: 56,
       child: ElevatedButton.icon(
         onPressed: state.selectedTime != null
-            ? () => ctrl.scheduleAlarm('[]')
+            ? () {
+                if (state.isScheduled) {
+                  ctrl.cancelAlarm();
+                } else {
+                  ctrl.scheduleAlarm(payload);
+                }
+              }
             : null,
         icon: Icon(state.isScheduled ? Icons.cancel : Icons.schedule),
         label: Text(state.isScheduled ? 'CANCEL ALARM' : 'SCHEDULE ALARM'),

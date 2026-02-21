@@ -17,6 +17,9 @@
 
     <!-- Battery Optimization Bypass -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    
+    <!-- Allows Launching Arbitrary Target Packages -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
 
     <application
         android:label="GhostTraffic Lab"
@@ -45,7 +48,7 @@
         <!-- Foreground Service (Bot Engine) -->
         <service
             android:name=".services.BotService"
-            android:exported="false"
+            android:exported="true"
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
@@ -55,7 +58,7 @@
         <!-- Accessibility Service (UI Automation) -->
         <service
             android:name=".services.ClickerService"
-            android:exported="false"
+            android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService"/>

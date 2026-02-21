@@ -7,7 +7,10 @@ part 'permissions_controller.g.dart';
 @riverpod
 class PermissionsController extends _$PermissionsController {
   @override
-  PermissionState build() => const PermissionState();
+  PermissionState build() {
+    Future.microtask(refreshAll);
+    return const PermissionState();
+  }
 
   Future<void> refreshAll() async {
     final bridge = ref.read(nativeBridgeServiceProvider);

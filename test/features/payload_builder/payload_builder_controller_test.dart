@@ -1,16 +1,27 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ghost_traffic_lab/features/payload_builder/presentation/payload_builder_controller.dart';
 import 'package:ghost_traffic_lab/product/models/payload_action.dart';
+import 'package:hive/hive.dart';
 
 void main() {
   late ProviderContainer container;
+  late Directory tempDir;
 
-  setUp(() {
+  setUp(() async {
+    tempDir = await Directory.systemTemp.createTemp('hive_test_');
+    Hive.init(tempDir.path);
+    await Hive.openBox<dynamic>('settings');
     container = ProviderContainer();
   });
 
-  tearDown(() => container.dispose());
+  tearDown(() async {
+    container.dispose();
+    await Hive.close();
+    await tempDir.delete(recursive: true);
+  });
 
   PayloadBuilderController ctrl() =>
       container.read(payloadBuilderControllerProvider.notifier);

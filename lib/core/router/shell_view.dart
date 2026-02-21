@@ -11,10 +11,11 @@ class ShellView extends StatelessWidget {
   Widget build(BuildContext context) {
     return AutoTabsScaffold(
       routes: const [
-        DashboardView(),
-        PayloadBuilderView(),
-        SchedulerView(),
-        LogsView(),
+        DashboardRoute(),
+        PayloadBuilderRoute(),
+        SchedulerRoute(),
+        LogsRoute(),
+        PermissionsRoute(),
       ],
       bottomNavigationBuilder: (_, tabsRouter) {
         return NavigationBar(
@@ -41,6 +42,11 @@ class ShellView extends StatelessWidget {
               icon: Icon(Icons.terminal_outlined),
               selectedIcon: Icon(Icons.terminal),
               label: 'Logs',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.security_outlined),
+              selectedIcon: Icon(Icons.security),
+              label: 'Permissions',
             ),
           ],
         );

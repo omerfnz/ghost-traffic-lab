@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ghost_traffic_lab/features/payload_builder/presentation/add_action_sheet.dart';
 import 'package:ghost_traffic_lab/features/payload_builder/presentation/payload_builder_controller.dart';
 import 'package:ghost_traffic_lab/features/payload_builder/presentation/payload_builder_widgets.dart';
 import 'package:ghost_traffic_lab/product/models/payload_action.dart';
@@ -44,7 +45,12 @@ class PayloadBuilderView extends ConsumerWidget {
       builder: (_) => AlertDialog(
         title: const Text('Payload JSON'),
         content: SelectableText(json),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }
